@@ -13,13 +13,30 @@ String usbCommand = "";
 
 //variables
 //wheel
-int wheelPWMctr = 1500;
+int default_uS_wheel = 1500;
+int wheelPWMctr = default_uS_wheel;
 int wheelPWMmin = 1200;  //fd 1085, default
 int wheelPWMmax = 1800;  //fd 1890, default
 //throttle
-int thrPWMctr = 1473;
+int default_uS_throttle = 1473;
+int thrPWMctr = default_uS_throttle;
 int thrPWMminDefault = 974;
 int thrPWMmaxDefault = 1969;
+//high/low gear
+int uS_highLow_high = 1927; //high gear, 1927, default.
+int uS_highLow_low = 1012; //low gear, 1012
+//differential, front
+int uS_diffFront_unlocked = 1024; //unlocked, 1024, default
+int uS_diffFront_locked = 1940; //locked, 1940
+//differential, back
+int uS_diffBack_unlocked = 1005;  //unlocked, 1005, default
+int uS_diffBack_locked = 1919;    //locked, 1919;
+
+int uS_wheel = default_uS_wheel;     // channel 1.  Ana In Ch.0 uS var - wheel
+int uS_throttle = default_uS_throttle;    // channel 2 Ana In Ch.1 uS var - throttle
+int uS_highlow = uS_highLow_high;      // channel 3, high and low gear. default is 1927 (high gear).
+int uS_diffFront = uS_diffFront_unlocked;        // channel 4, front differential
+int uS_diffBack = uS_diffBack_unlocked;        // channel 5, rear differntial.
 
 void setup() {            //This function gets called when the Arduino starts
     Serial.begin(57600);   //This code sets up the Serial port at 115200 baud rate
