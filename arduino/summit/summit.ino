@@ -8,11 +8,10 @@ Servo servoDiffFront;
 Servo servoDiffBack;
 
 //com
-String sBuffer = "";
-String usbInstructionDataString = "";
+int incomingByte;
 int usbCommandVal = 0;
-boolean USBcommandExecuted = true;
-String usbCommand = "";
+int usbCommand = 0;
+String sBuffer = "";
 
 //variables
 //wheel
@@ -36,7 +35,7 @@ int uS_diffBack_unlocked = 1150;  //unlocked, 1005, default
 int uS_diffBack_locked = 1650;    //locked, 1919;
 //batteries
 unsigned long batt_read_time = millis();
-int batt_read_delay = 666;
+int batt_read_delay = 1000;
 int b1_0 = A0;
 int b1_1 = A2;
 int b2_0 = A1;
@@ -101,79 +100,75 @@ void monitorBatteries () {
     }
 }
 
-void delegate(String cmd, int cmdval) {
-    if (cmd.equals("W")) {
-        servoWheel.writeMicroseconds(cmdval);  // wheel
+void delegate() {
+    if (usbCommand == 87) {
+        //W = 87
+        if (usbCommandVal < wheelPWMmin) {
+            usbCommandVal = wheelPWMmin;
+        }
+        else if (usbCommandVal > wheelPWMmax) {
+            usbCommandVal = wheelPWMmax;
+        }
+        servoWheel.writeMicroseconds(usbCommandVal);  // wheel
     }
-    else if (cmd.equals("T")) {
-        servoThrottle.writeMicroseconds(cmdval);  // throttle
+    else if (usbCommand == 84) {
+        //T = 84
+        if (usbCommandVal < thrPWMminDefault || usbCommandVal > thrPWMmaxDefault) {
+            usbCommandVal = thrPWMctr;
+        }
+        servoThrottle.writeMicroseconds(usbCommandVal);  // throttle
     }
-    else if (cmd.equals("H")) {
-        if (cmdval == 0) {
+    else if (usbCommand == 72) {
+        //H = 72
+        if (usbCommandVal == 0) {
             servoHighLow.writeMicroseconds(uS_highLow_low);
         }
         else {
             servoHighLow.writeMicroseconds(uS_highLow_high);
         }
     }
-    else if (cmd.equals("F")) {
-        if (cmdval == 0) {
+    else if (usbCommand == 70) {
+        //F = 70
+        if (usbCommandVal == 0) {
             servoDiffFront.writeMicroseconds(uS_diffFront_unlocked);
         }
         else {
             servoDiffFront.writeMicroseconds(uS_diffFront_locked);
         }
     }
-    else if (cmd.equals("B")) {
-        if (cmdval == 0) {
+    else if (usbCommand == 66) {
+        //B = 66
+        if (usbCommandVal == 0) {
             servoDiffBack.writeMicroseconds(uS_diffBack_unlocked);
         }
         else {
             servoDiffBack.writeMicroseconds(uS_diffBack_locked);
         }
     }
+    usbCommand = 0;
+    usbCommandVal = 0;
 }
 
 void serialListen()
 {
-    //char arduinoSerialData; //FOR CONVERTING BYTE TO CHAR.
-    //String currentChar = "";
     if(Serial.available() > 0) {
-        //arduinoSerialData = char(Serial.read());   //BYTE TO CHAR.
-
-        
-
-        currentChar = (String)arduinoSerialData; //incoming data equated to c.
-        if(!currentChar.equals("1") && !currentChar.equals("2") && !currentChar.equals("3") && !currentChar.equals("4") && !currentChar.equals("5") && !currentChar.equals("6") && !currentChar.equals("7") && !currentChar.equals("8") && !currentChar.equals("9") && !currentChar.equals("0") && !currentChar.equals(".")) { 
-            //the character is not a number, not a value to go along with a command,
-            //so it is probably a command.
-            if(!usbInstructionDataString.equals("")) {
-                //usbCommandVal = Integer.parseInt(usbInstructionDataString);
-                char charBuf[30];
-                usbInstructionDataString.toCharArray(charBuf, 30);
-                usbCommandVal = atoi(charBuf);
-
+        if (usbCommand == 0) { 
+            incomingByte = Serial.read();
+            if (incomingByte != 13) {
+                usbCommand = incomingByte;
             }
-            if((USBcommandExecuted == false) && (arduinoSerialData == 13)) {
-                delegate(usbCommand, usbCommandVal);
-                USBcommandExecuted = true;
-                Serial.println("ROGER");
-            }
-            if((arduinoSerialData != 13) && (arduinoSerialData != 10)) {
-                usbCommand = currentChar;
-            }
-            usbInstructionDataString = "";
-        } else {
-            //in this case, we're probably receiving a command value.
-            //store it
-            usbInstructionDataString = usbInstructionDataString + currentChar;
-            USBcommandExecuted = false;
+        }
+        else {
+            usbCommandVal = Serial.parseInt();
+        }
+        if (usbCommand && usbCommandVal) {
+            delegate();
         }
     }
 }
 
 void loop() {             //This function loops while the arduino is powered
-    //monitorBatteries();
+    monitorBatteries();
     serialListen();
     printsbuffer();
 }
