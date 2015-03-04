@@ -10,6 +10,7 @@ Servo servoDiffBack;
 //com
 int incomingByte;
 int usbCommandVal = 0;
+boolean usbGotCommandVal = false;
 int usbCommand = 0;
 String sBuffer = "";
 
@@ -31,8 +32,8 @@ int uS_highLow_low = 1150; //low gear, 1012
 int uS_diffFront_unlocked = 1250; //unlocked, 1024, default
 int uS_diffFront_locked = 1850; //locked, 1940
 //differential, back
-int uS_diffBack_unlocked = 1150;  //unlocked, 1005, default
-int uS_diffBack_locked = 1650;    //locked, 1919;
+int uS_diffBack_unlocked = 1000;  //unlocked, 1005, default
+int uS_diffBack_locked = 1640;    //locked, 1919;
 //batteries
 unsigned long batt_read_time = millis();
 int batt_read_delay = 1000;
@@ -147,6 +148,7 @@ void delegate() {
     }
     usbCommand = 0;
     usbCommandVal = 0;
+    usbGotCommandVal = false;
 }
 
 void serialListen()
@@ -154,14 +156,15 @@ void serialListen()
     if(Serial.available() > 0) {
         if (usbCommand == 0) { 
             incomingByte = Serial.read();
-            if (incomingByte != 13) {
+            if (incomingByte != 32 && incomingByte != 13) {
                 usbCommand = incomingByte;
             }
         }
         else {
             usbCommandVal = Serial.parseInt();
+            usbGotCommandVal = true;
         }
-        if (usbCommand && usbCommandVal) {
+        if (usbCommand && usbGotCommandVal) {
             delegate();
         }
     }
