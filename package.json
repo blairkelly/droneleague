@@ -1,0 +1,22 @@
+{
+  "name": "droneleague",
+  "version": "0.0.0",
+  "description": "Droneleague",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blairkelly/droneleague.git"
+  },
+  "author": "Blair Kelly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blairkelly/droneleague/issues"
+  },
+  "homepage": "https://github.com/blairkelly/droneleague",
+  "dependencies": {
+    "socket.io-client": "^1.3.5"
+  }
+}
