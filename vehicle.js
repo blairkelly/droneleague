@@ -1,6 +1,6 @@
 //vehicle
 var config = require('./config');
-var socket = require('socket.io-client')('http://10.0.1.8:3000');
+var socket = require('socket.io-client')(config.serveraddress);
 var serialport_lib = require("serialport");
 
 serialport_lib.list(function (err, ports) {
