@@ -27,7 +27,7 @@ int thrPWMminDefault = 974;
 int thrPWMmaxDefault = 1969;
 //high/low gear
 int uS_highLow_high = 1850; //high gear, 1927, default.
-int uS_highLow_low = 1150; //low gear, 1012
+int uS_highLow_low = 1200; //low gear, 1012
 //differential, front
 int uS_diffFront_unlocked = 1250; //unlocked, 1024, default
 int uS_diffFront_locked = 1850; //locked, 1940
@@ -149,6 +149,7 @@ void delegate() {
     usbCommand = 0;
     usbCommandVal = 0;
     usbGotCommandVal = false;
+    delay(1);
 }
 
 void serialListen()
@@ -161,11 +162,16 @@ void serialListen()
             }
         }
         else {
-            usbCommandVal = Serial.parseInt();
-            usbGotCommandVal = true;
-        }
-        if (usbCommand && usbGotCommandVal) {
-            delegate();
+            if (!usbGotCommandVal) {
+                usbCommandVal = Serial.parseInt();
+                usbGotCommandVal = true;
+            }
+            else {
+                incomingByte = Serial.read();
+                if (incomingByte == 32 || incomingByte == 13) {
+                    delegate();
+                }
+            }
         }
     }
 }
