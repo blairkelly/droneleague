@@ -177,7 +177,7 @@ void serialListen()
 }
 
 void loop() {             //This function loops while the arduino is powered
-    monitorBatteries();
+    //monitorBatteries();
     serialListen();
     printsbuffer();
 }
