@@ -1,0 +1,25 @@
+extends ../layouts/main
+
+block body
+    .title Summit Drone
+    .start Start
+    .stop Stop
+    .display_axes
+        .leftx leftx: 
+            span
+        .lefty lefty: 
+            span
+        .rightx rightx: 
+            span
+        .righty righty: 
+            span
+    .display_throttles
+        .lt lt: 
+            span
+        .rt rt: 
+            span
+
+block pagespecific_scripts
+    //-script(type="text/javascript", src="/scripts/angular/angular.min.js")
+    script(type="text/javascript")
+        include scripts.js
